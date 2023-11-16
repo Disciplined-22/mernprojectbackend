@@ -4,7 +4,7 @@ const app = express();
 require("./DB/db");
 const cors = require("cors");
 const router = require("./Routes/router");
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 8000
 
 
 app.use(cors());
