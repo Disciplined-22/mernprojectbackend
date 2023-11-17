@@ -1,6 +1,9 @@
 
 const users = require("../Models/userSchema")
 const moment = require("moment");
+const csv = require("fast-csv")
+const fs = require("fs")
+const BASE_URL = process.env.BASE_URL
 
 
 exports.userpost = async (req, res) => {
@@ -148,6 +151,58 @@ exports.chartdata = async(req,res) => {
       }
 
 
+}
+
+
+exports.userExport = async (req, res) => {
+    try {
+        const usersdata = await users.find();
+
+        const csvStream = csv.format({ headers: true });
+
+        if (!fs.existsSync("public/files/export/")) {
+            if (!fs.existsSync("public/files")) {
+                fs.mkdirSync("public/files/");
+            }
+            if (!fs.existsSync("public/files/export")) {
+                fs.mkdirSync("./public/files/export");
+            }
+        }
+
+        const writablestream = fs.createWriteStream(
+            "public/files/export/users.csv"
+        );
+
+        csvStream.pipe(writablestream);
+
+        writablestream.on("finish", function () {
+            res.status(200).json({
+                downloadUrl: `${BASE_URL}/files/export/users.csv`,
+            });
+        });
+        if (usersdata.length > 0) {
+            usersdata.map((user) => {
+                csvStream.write({
+                    FirstName: user.fname ? user.fname : "-",
+                    LastName: user.lname ? user.lname : "-",
+                    Email: user.email ? user.email : "-",
+                    Phone: user.mobile ? user.mobile : "-",
+                    Gender: user.gender ? user.gender : "-",
+                    Status: user.status ? user.status : "-",
+                    Profile: user.profile ? user.profile : "-",
+                    Location: user.location ? user.location : "-",
+                    DateCreated: user.datecreated ? user.datecreated : "-",
+                    DateUpdated: user.dateUpdated ? user.dateUpdated : "-",
+                })
+            })
+        }
+        csvStream.end();
+        writablestream.end();
+
+
+    } catch (error) {
+        res.status(401).json({error : "export is not working"})
+    }
 }
 
 
