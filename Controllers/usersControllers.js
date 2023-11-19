@@ -26,7 +26,7 @@ exports.userpost = async (req, res) => {
 
             const userData = new users({
                 fname, lname, email, mobile, gender, location, status, profile: file, datecreated
-          
+
             });
             await userData.save();
             res.status(200).json(userData);
@@ -41,7 +41,7 @@ exports.userpost = async (req, res) => {
 
 
 
-exports.userget = async (req,res) => {
+exports.userget = async (req, res) => {
 
     const search = req.query.search || ""
 
@@ -50,28 +50,28 @@ exports.userget = async (req,res) => {
     }
 
 
-try{
-    const getdata = await users.find(query)
-    console.log("hid thsi is getdta",getdata)
-    res.status(200).json(getdata)
-}catch(error){
-    console.log(error)
-}
+    try {
+        const getdata = await users.find(query)
+        console.log("hid thsi is getdta", getdata)
+        res.status(200).json(getdata)
+    } catch (error) {
+        console.log(error)
+    }
 
 }
 
 
 
-exports.singleuser = async (req,res) => {
+exports.singleuser = async (req, res) => {
 
-     const {id} = req.params
+    const { id } = req.params
 
     try {
-       const useredit2 = await users.findOne({_id : id})
+        const useredit2 = await users.findOne({ _id: id })
         res.status(200).json(useredit2)
 
     } catch (error) {
-        res.status(404).json({error : "No data"})
+        res.status(404).json({ error: "No data" })
     }
 
 }
@@ -86,7 +86,7 @@ exports.useredit = async (req, res) => {
     const dateUpdated = moment(new Date()).format("YYYY-MM-DD hh:mm:ss");
 
     try {
-        const updateuser = await users.findByIdAndUpdate({_id:id}, {
+        const updateuser = await users.findByIdAndUpdate({ _id: id }, {
             fname, lname, email, mobile, gender, location, status, profile: file, dateUpdated
         }, {
             new: true
@@ -116,39 +116,39 @@ exports.userstatus = async (req, res) => {
 
 
 
-exports.chartdata = async(req,res) => {
+exports.chartdata = async (req, res) => {
 
     try {
         // Use MongoDB aggregation to group users by day
         const userStats = await users.aggregate([ // Change from User to users
-          {
-            $group: {
-              _id: {
-                $dateToString: {
-                  format: '%Y-%m-%d',
-                  date: '$datecreated',
-                  timezone: 'UTC',
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: '%Y-%m-%d',
+                            date: '$datecreated',
+                            timezone: 'UTC',
+                        },
+                    },
+                    count: { $sum: 1 },
                 },
-              },
-              count: { $sum: 1 },
             },
-          },
-          {
-            $sort: { _id: 1 },
-          },
+            {
+                $sort: { _id: 1 },
+            },
         ]);
-    
+
         // Format the data for the chart
         const labels = userStats.map((stat) => stat._id);
         const data = userStats.map((stat) => stat.count);
-    
+
         res.json({ labels, data });
-      }
-    
+    }
+
     catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
-      }
+    }
 
 
 }
@@ -177,7 +177,7 @@ exports.userExport = async (req, res) => {
 
         writablestream.on("finish", function () {
             res.status(200).json({
-                downloadUrl: `${BASE_URL}/files/export/users.csv`,
+                downloadUrl: `${BASE_URL}files/export/users.csv`,
             });
         });
         if (usersdata.length > 0) {
@@ -201,7 +201,7 @@ exports.userExport = async (req, res) => {
 
 
     } catch (error) {
-        res.status(401).json({error : "export is not working"})
+        res.status(401).json({ error: "export is not working" })
     }
 }
 
