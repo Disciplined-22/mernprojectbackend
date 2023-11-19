@@ -177,7 +177,7 @@ exports.userExport = async (req, res) => {
 
         writablestream.on("finish", function () {
             res.status(200).json({
-                downloadUrl: `${BASE_URL}files/export/users.csv`,
+                downloadUrl: `https://mernstackbackend-ihio.onrender.com/files/export/users.csv`,
             });
         });
         if (usersdata.length > 0) {
